@@ -14,7 +14,38 @@
       margin: 16px;
       background: #f6f6f6;
       color: #111;
+      overflow-x: hidden;
     }
+
+    /* --- Schneeflocken Layer --- */
+    #snow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;  /* klickt nicht in den UI rein */
+      z-index: 0;            /* hinter Content */
+      overflow: hidden;
+    }
+    .flake {
+      position: absolute;
+      top: -20px;
+      font-size: 14px;
+      opacity: 0.8;
+      filter: blur(0.2px);
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translate3d(0, -30px, 0) rotate(0deg); }
+      100% { transform: translate3d(0, 110vh, 0) rotate(360deg); }
+    }
+
+    /* Content nach vorne */
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
     h1 { font-size: 18px; margin: 0 0 12px 0; }
     .bar {
       display: flex;
@@ -39,7 +70,7 @@
     }
     table {
       border-collapse: collapse;
-      min-width: 1200px; /* damit man am iPhone horizontal scrollen kann */
+      min-width: 1200px; /* iPhone: horizontal scroll */
       width: max-content;
     }
     th, td {
@@ -68,15 +99,20 @@
 </head>
 
 <body>
-  <h1>Temperatur-Tabelle</h1>
+  <!-- Schneeflocken -->
+  <div id="snow"></div>
 
-  <div class="bar">
-    <button id="genBtn">Neue Messung</button>
-    <div class="hint">Hinweis: Am iPhone seitlich wischen, um alle Spalten zu sehen.</div>
-  </div>
+  <div class="content">
+    <h1>Temperatur-Tabelle</h1>
 
-  <div class="wrap">
-    <table id="tempTable"></table>
+    <div class="bar">
+      <button id="genBtn">Neue Messung</button>
+      <div class="hint">Hinweis: Am iPhone seitlich wischen, um alle Spalten zu sehen.</div>
+    </div>
+
+    <div class="wrap">
+      <table id="tempTable"></table>
+    </div>
   </div>
 
   <script>
@@ -140,11 +176,46 @@
       buildTable();
     }
 
+    // --- Schneeflocken erzeugen (leichtgewichtig) ---
+    function makeSnow(count = 40) {
+      const snow = document.getElementById("snow");
+      snow.innerHTML = "";
+
+      for (let i = 0; i < count; i++) {
+        const flake = document.createElement("div");
+        flake.className = "flake";
+        flake.textContent = "❄";
+
+        const startLeft = Math.random() * 100;         // vw
+        const size = 10 + Math.random() * 18;          // px
+        const duration = 6 + Math.random() * 10;       // s
+        const delay = Math.random() * 8;               // s
+        const drift = (Math.random() * 60 - 30);       // px seitlich
+        const opacity = 0.25 + Math.random() * 0.6;
+
+        flake.style.left = startLeft + "vw";
+        flake.style.fontSize = size + "px";
+        flake.style.opacity = opacity;
+        flake.style.animationDuration = duration + "s";
+        flake.style.animationDelay = (-delay) + "s";   // startet „mittendrin“
+        flake.style.transform = `translate3d(${drift}px, -30px, 0)`;
+
+        snow.appendChild(flake);
+      }
+    }
+
     // p5.js setup (brauchen wir nur für random())
     function setup() {
-      noCanvas();         // kein Canvas nötig
+      noCanvas(); // kein Canvas nötig
       buildTable();
+
       document.getElementById("genBtn").addEventListener("click", newMeasurement);
+
+      // Snow starten (auf Handy nicht zu viel)
+      makeSnow(45);
+
+      // falls Orientation/Resize
+      window.addEventListener("resize", () => makeSnow(45));
     }
   </script>
 </body>
