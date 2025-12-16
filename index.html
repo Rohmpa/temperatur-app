@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temperatur-Tabelle</title>
+
+  <!-- p5.js via CDN (Internet nötig) -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+      background: #f6f6f6;
+      color: #111;
+    }
+    h1 { font-size: 18px; margin: 0 0 12px 0; }
+    .bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    button {
+      padding: 10px 14px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      background: #e0e0e0;
+      font-size: 14px;
+    }
+    button:active { transform: scale(0.98); }
+    .wrap {
+      overflow-x: auto;
+      border: 1px solid #bbb;
+      border-radius: 10px;
+      background: #fff;
+    }
+    table {
+      border-collapse: collapse;
+      min-width: 1200px; /* damit man am iPhone horizontal scrollen kann */
+      width: max-content;
+    }
+    th, td {
+      border: 1px solid #bbb;
+      padding: 10px 12px;
+      text-align: center;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #efefef;
+      z-index: 1;
+    }
+    td:first-child, th:first-child {
+      position: sticky;
+      left: 0;
+      background: #fff;
+      z-index: 2;
+      font-weight: bold;
+    }
+    th:first-child { background: #efefef; }
+    .hint { font-size: 12px; opacity: 0.75; }
+  </style>
+</head>
+
+<body>
+  <h1>Temperatur-Tabelle</h1>
+
+  <div class="bar">
+    <button id="genBtn">Neue Messung</button>
+    <div class="hint">Hinweis: Am iPhone seitlich wischen, um alle Spalten zu sehen.</div>
+  </div>
+
+  <div class="wrap">
+    <table id="tempTable"></table>
+  </div>
+
+  <script>
+    // Spaltennamen (OHNE Klammern)
+    const headers = [
+      "Fleisch Laden",
+      "Fisch Laden",
+      "Beilagen Laden",
+      "Kalter Platz Laden",
+      "Eishaus 1",
+      "Eishaus 2",
+      "Tiefkühlhaus",
+      "Tiefkühler Fleisch",
+      "Tiefkühler Brot 1",
+      "Tiefkühler Brot 2",
+      "Frühstücks Laden"
+    ];
+
+    // Bereiche passend zu deinen Klammern
+    const tMin = [ 2, 2, 3, 3, 4, 4, -20, -20, -20, -20, -20 ];
+    const tMax = [ 4, 4, 5, 5, 7, 7, -16, -16, -16, -16, -16 ];
+
+    // genau EINE Messzeile
+    let values = new Array(headers.length).fill(null);
+
+    function buildTable() {
+      const table = document.getElementById("tempTable");
+      table.innerHTML = "";
+
+      // Header row
+      const trH = document.createElement("tr");
+      const th0 = document.createElement("th");
+      th0.textContent = "Messung";
+      trH.appendChild(th0);
+
+      headers.forEach(h => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        trH.appendChild(th);
+      });
+      table.appendChild(trH);
+
+      // Value row
+      const trV = document.createElement("tr");
+      const td0 = document.createElement("td");
+      td0.textContent = "1";
+      trV.appendChild(td0);
+
+      values.forEach(v => {
+        const td = document.createElement("td");
+        td.textContent = (v === null) ? "—" : `${v.toFixed(1)} °C`;
+        trV.appendChild(td);
+      });
+      table.appendChild(trV);
+    }
+
+    function newMeasurement() {
+      for (let i = 0; i < headers.length; i++) {
+        values[i] = random(tMin[i], tMax[i]); // p5.js random(min, max)
+      }
+      buildTable();
+    }
+
+    // p5.js setup (brauchen wir nur für random())
+    function setup() {
+      noCanvas();         // kein Canvas nötig
+      buildTable();
+      document.getElementById("genBtn").addEventListener("click", newMeasurement);
+    }
+  </script>
+</body>
+</html>
