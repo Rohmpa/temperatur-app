@@ -1,0 +1,473 @@
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temperatur-Tabelle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Temperatur Mobile</title>
+
+  <!-- p5.js via CDN (Internet nötig) -->
+  <!-- p5.js nur für random() -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: rgba(255,255,255,0.08);
+      --card2: rgba(255,255,255,0.10);
+      --border: rgba(255,255,255,0.18);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.70);
+      --accent: rgba(255,255,255,0.14);
+      --good: rgba(120, 255, 160, 0.22);
+      --bad: rgba(255, 120, 120, 0.22);
+    }
+
+    /* Mobile-only: Seite verstecken auf großen Screens */
+    @media (min-width: 900px) {
+      body::before {
+        content: "Diese Version ist Mobile-Only. Öffne sie am iPhone oder verkleinere das Browserfenster.";
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 32px;
+        background: #111;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        z-index: 9999;
+      }
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 16px;
+      background: #f6f6f6;
+      color: #111;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, #152042 0%, var(--bg) 55%, #070b14 100%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* --- Schneeflocken Layer --- */
+    /* Schneeflocken Layer */
+    #snow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;  /* klickt nicht in den UI rein */
+      z-index: 0;            /* hinter Content */
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .flake {
+      position: absolute;
+      top: -20px;
+      font-size: 14px;
+      top: -24px;
+      opacity: 0.8;
+      filter: blur(0.2px);
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      will-change: transform;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    @keyframes fall {
+      0%   { transform: translate3d(0, -30px, 0) rotate(0deg); }
+      0%   { transform: translate3d(0, -40px, 0) rotate(0deg); }
+      100% { transform: translate3d(0, 110vh, 0) rotate(360deg); }
+    }
+
+    /* Content nach vorne */
+    .content {
+    .app {
+      position: relative;
+      z-index: 1;
+      padding: 16px 16px 28px;
+      padding-bottom: calc(28px + env(safe-area-inset-bottom));
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 18px; margin: 0 0 12px 0; }
+    .bar {
+    .top {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .titleRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    button {
+      padding: 10px 14px;
+      border: 1px solid #000;
+      border-radius: 10px;
+      background: #e0e0e0;
+      font-size: 14px;
+    }
+    button:active { transform: scale(0.98); }
+    .wrap {
+      overflow-x: auto;
+      border: 1px solid #bbb;
+      border-radius: 10px;
+      background: #fff;
+
+    h1 {
+      font-size: 20px;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+    table {
+      border-collapse: collapse;
+      min-width: 1200px; /* iPhone: horizontal scroll */
+      width: max-content;
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    th, td {
+      border: 1px solid #bbb;
+      padding: 10px 12px;
+      text-align: center;
+
+    .pill {
+      font-size: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 14px;
+      font-size: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.10));
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .btn:active { transform: scale(0.99); }
+
+    .grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .cardInner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 14px;
+    }
+
+    .place {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #efefef;
+      z-index: 1;
+
+    .range {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    td:first-child, th:first-child {
+      position: sticky;
+      left: 0;
+      background: #fff;
+      z-index: 2;
+      font-weight: bold;
+
+    .valueBox {
+      min-width: 112px;
+      text-align: right;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .value {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .unit {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .statusGood { background: var(--good); }
+    .statusBad  { background: var(--bad); }
+
+    .footerHint {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+      opacity: 0.9;
+    }
+    th:first-child { background: #efefef; }
+    .hint { font-size: 12px; opacity: 0.75; }
+  </style>
+</head>
+
+<body>
+  <!-- Schneeflocken -->
+  <div id="snow"></div>
+
+  <div class="content">
+    <h1>Temperatur-Tabelle</h1>
+  <div class="app">
+    <div class="top">
+      <div class="titleRow">
+        <div>
+          <h1>Temperatur Messung</h1>
+          <div class="subtitle">Mobile Ansicht • 1 Messzeile • Button überschreibt Werte</div>
+        </div>
+        <div class="pill" id="lastTime">—</div>
+      </div>
+
+    <div class="bar">
+      <button id="genBtn">Neue Messung</button>
+      <div class="hint">Hinweis: Am iPhone seitlich wischen, um alle Spalten zu sehen.</div>
+      <button class="btn" id="genBtn">Neue Messung</button>
+    </div>
+
+    <div class="wrap">
+      <table id="tempTable"></table>
+    <div class="grid" id="cards"></div>
+
+    <div class="footerHint">
+      Tipp: Wenn du das online über GitHub Pages öffnest, kannst du es in Safari über „Teilen → Zum Home-Bildschirm“
+      wie eine App installieren.
+    </div>
+  </div>
+
+  <script>
+    // Spaltennamen (OHNE Klammern)
+    // Namen ohne Klammern
+    const headers = [
+      "Fleisch Laden",
+      "Fisch Laden",
+@@ -131,91 +242,124 @@ <h1>Temperatur-Tabelle</h1>
+      "Frühstücks Laden"
+    ];
+
+    // Bereiche passend zu deinen Klammern
+    // Bereiche
+    const tMin = [ 2, 2, 3, 3, 4, 4, -20, -20, -20, -20, -20 ];
+    const tMax = [ 4, 4, 5, 5, 7, 7, -16, -16, -16, -16, -16 ];
+
+    // genau EINE Messzeile
+    // 1 Messung (überschreiben)
+    let values = new Array(headers.length).fill(null);
+
+    function buildTable() {
+      const table = document.getElementById("tempTable");
+      table.innerHTML = "";
+
+      // Header row
+      const trH = document.createElement("tr");
+      const th0 = document.createElement("th");
+      th0.textContent = "Messung";
+      trH.appendChild(th0);
+
+      headers.forEach(h => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        trH.appendChild(th);
+      });
+      table.appendChild(trH);
+
+      // Value row
+      const trV = document.createElement("tr");
+      const td0 = document.createElement("td");
+      td0.textContent = "1";
+      trV.appendChild(td0);
+
+      values.forEach(v => {
+        const td = document.createElement("td");
+        td.textContent = (v === null) ? "—" : `${v.toFixed(1)} °C`;
+        trV.appendChild(td);
+      });
+      table.appendChild(trV);
+    function rangeLabel(i) {
+      return `${tMin[i]} bis ${tMax[i]} °C`;
+    }
+
+    function isInRange(i, v) {
+      return v >= tMin[i] && v <= tMax[i];
+    }
+
+    function renderCards() {
+      const wrap = document.getElementById("cards");
+      wrap.innerHTML = "";
+
+      for (let i = 0; i < headers.length; i++) {
+        const v = values[i];
+        const ok = (v === null) ? null : isInRange(i, v);
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const inner = document.createElement("div");
+        inner.className = "cardInner";
+
+        const left = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "place";
+        title.textContent = headers[i];
+
+        const range = document.createElement("div");
+        range.className = "range";
+        range.textContent = `Sollbereich: ${rangeLabel(i)}`;
+
+        left.appendChild(title);
+        left.appendChild(range);
+
+        const valueBox = document.createElement("div");
+        valueBox.className = "valueBox";
+        if (ok === true) valueBox.classList.add("statusGood");
+        if (ok === false) valueBox.classList.add("statusBad");
+
+        const value = document.createElement("div");
+        value.className = "value";
+        value.textContent = (v === null) ? "—" : v.toFixed(1);
+
+        const unit = document.createElement("div");
+        unit.className = "unit";
+        unit.textContent = "°C";
+
+        valueBox.appendChild(value);
+        valueBox.appendChild(unit);
+
+        inner.appendChild(left);
+        inner.appendChild(valueBox);
+
+        card.appendChild(inner);
+        wrap.appendChild(card);
+      }
+    }
+
+    function newMeasurement() {
+      for (let i = 0; i < headers.length; i++) {
+        values[i] = random(tMin[i], tMax[i]); // p5.js random(min, max)
+        values[i] = random(tMin[i], tMax[i]); // p5.js random()
+      }
+      buildTable();
+
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      document.getElementById("lastTime").textContent = `Letzte Messung: ${hh}:${mm}`;
+
+      renderCards();
+    }
+
+    // --- Schneeflocken erzeugen (leichtgewichtig) ---
+    // Schneeflocken: leichtgewichtig & handy-friendly
+    function makeSnow(count = 40) {
+      const snow = document.getElementById("snow");
+      snow.innerHTML = "";
+      const symbols = ["❄", "❅", "✻"];
+
+      for (let i = 0; i < count; i++) {
+        const flake = document.createElement("div");
+        flake.className = "flake";
+        flake.textContent = "❄";
+        flake.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+
+        const startLeft = Math.random() * 100;         // vw
+        const size = 10 + Math.random() * 18;          // px
+        const duration = 6 + Math.random() * 10;       // s
+        const delay = Math.random() * 8;               // s
+        const drift = (Math.random() * 60 - 30);       // px seitlich
+        const opacity = 0.25 + Math.random() * 0.6;
+        const startLeft = Math.random() * 100;     // vw
+        const size = 10 + Math.random() * 18;      // px
+        const duration = 6 + Math.random() * 12;   // s
+        const delay = Math.random() * 10;          // s
+        const opacity = 0.15 + Math.random() * 0.7;
+
+        flake.style.left = startLeft + "vw";
+        flake.style.fontSize = size + "px";
+        flake.style.opacity = opacity;
+        flake.style.animationDuration = duration + "s";
+        flake.style.animationDelay = (-delay) + "s";   // startet „mittendrin“
+        flake.style.transform = `translate3d(${drift}px, -30px, 0)`;
+        flake.style.animationDelay = (-delay) + "s";
+
+        // leichter „Wind“
+        const drift = (Math.random() * 80 - 40);
+        flake.style.transform = `translate3d(${drift}px, -40px, 0)`;
+
+        snow.appendChild(flake);
+      }
+    }
+
+    // p5.js setup (brauchen wir nur für random())
+    // p5.js init (nur random + noCanvas)
+    function setup() {
+      noCanvas(); // kein Canvas nötig
+      buildTable();
+
+      document.getElementById("genBtn").addEventListener("click", newMeasurement);
+      noCanvas();
+
+      // Snow starten (auf Handy nicht zu viel)
+      makeSnow(45);
+      renderCards();
+      makeSnow(42);
+
+      // falls Orientation/Resize
+      window.addEventListener("resize", () => makeSnow(45));
+      document.getElementById("genBtn").addEventListener("click", newMeasurement);
+      window.addEventListener("resize", () => makeSnow(42));
+    }
+  </script>
+</body>
